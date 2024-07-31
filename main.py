@@ -47,7 +47,7 @@ def getWalletData(wallet: str):
                     totalProfitPercent = f"{data['total_profit_pnl'] * 100:.2f}%"
                     realizedProfit7dUSD = f"${data['realized_profit_7d']:,.2f}"
                     realizedProfit30dUSD = f"${data['realized_profit_30d']:,.2f}"
-                    winrate = f"{data['winrate']:.2f}%" if data['winrate'] is not None else "?"
+                    winrate = f"{data['winrate'] * 100:.2f}%" if data['winrate'] is not None else "?"
                     try:
                         tags = data['tags'] 
                     except Exception:
