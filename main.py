@@ -1,10 +1,10 @@
 import json
 import time
-import random
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 skipWallets = False
+skippedWallets = 0
 
 choice = input("[❓] Skip wallets with no 7d or 30d PnL data (Y/N): ")
 
@@ -31,6 +31,8 @@ with open('wallets.txt', 'r') as f:
     print(f"[✅] Successfully grabbed {len(wallets)} wallets")
 
 def getWalletData(wallet: str):
+    global skippedWallets
+
     walletEndpoint = f"https://gmgn.ai/defi/quotation/v1/smartmoney/sol/walletNew/{wallet}?period=7d"
     response = requests.get(walletEndpoint)
 
@@ -62,8 +64,10 @@ def getWalletData(wallet: str):
                     }
                 else:
                     if skipWallets:
-                        print(f"[🤖] Skipped {wallet}")
+                        skippedWallets += 1
+                        print(f"[🤖] Skipped {skippedWallets} wallets", end="\r")
                         return None
+                        
                     else:
                         directLink = f"https://gmgn.ai/sol/address/{wallet}"
                         return {
@@ -71,6 +75,7 @@ def getWalletData(wallet: str):
                             "directLink": directLink,
                             "tags": ["Skipped"]
                         }
+
             except Exception as e:
                 print(f"{e} - {wallet}")
     return None
