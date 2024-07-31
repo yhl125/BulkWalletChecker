@@ -1,5 +1,5 @@
 <p align="center">
-	A bulk wallet checker to gather PnL data on wallets.</br>
+	A bulk wallet checker to gather PnL data on Solana wallets.</br>
 </p>
 <p align="center">
 1. Add list of wallets to wallets.txt <br>
