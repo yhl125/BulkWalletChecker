@@ -47,7 +47,11 @@ def getWalletData(wallet: str):
                     totalProfitPercent = f"{data['total_profit_pnl'] * 100:.2f}%"
                     realizedProfit7dUSD = f"${data['realized_profit_7d']:,.2f}"
                     realizedProfit30dUSD = f"${data['realized_profit_30d']:,.2f}"
-                    winrate = f"{data['winrate'] * 100:.2f}%" if data['winrate'] is not None else "?"
+                    winrate_7d = f"{data['winrate'] * 100:.2f}%" if data['winrate'] is not None else "?"
+                    winrate_30data = requests.get(f"https://gmgn.ai/defi/quotation/v1/smartmoney/sol/walletNew/{wallet}?period=30d").json()['data']
+                    winrate_30d = f"{winrate_30data['winrate'] * 100:.2f}%" if winrate_30data['winrate'] is not None else "?"
+                    
+
                     try:
                         tags = data['tags'] 
                     except Exception:
@@ -58,7 +62,8 @@ def getWalletData(wallet: str):
                         "totalProfitPercent": totalProfitPercent,
                         "7dUSDProfit": realizedProfit7dUSD,
                         "30dUSDProfit": realizedProfit30dUSD,
-                        "winrate": winrate,
+                        "winrate_7d": winrate_7d,
+                        "winrate_30d": winrate_30d,
                         "tags": tags,
                         "directLink": directLink
                     }
@@ -107,4 +112,4 @@ identifier = shorten(list(result_dict)[0])
 
 with open(f'walletData_{identifier}.json', 'w') as outfile:
     json.dump(result_dict, outfile, indent=4)
-    print(f"[✅] Dumped profit data for {len(result_dict)} wallet(s) | Requests/Sec: {requestsSec:.2f} | Time Taken: {totalTime:.2f}s")
+    print(f"[✅] Dumped profit data for {len(result_dict)} wallet(s) | Requests/Sec: {requestsSec:.2f} | Time Taken: {totalTime:.2f}s | File Identifier: {identifier}")
