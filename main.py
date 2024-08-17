@@ -1,10 +1,16 @@
 import json
 import time
-import requests
+import tls_client
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 skipWallets = False
 skippedWallets = 0
+
+# Initialize tls_client session
+session = tls_client.Session(
+    client_identifier="chrome_105",
+    random_tls_extension_order=True
+)
 
 choice = input("[❓] Skip wallets with no 7d or 30d PnL data (Y/N): ")
 
@@ -34,7 +40,7 @@ def getWalletData(wallet: str):
     global skippedWallets
 
     walletEndpoint = f"https://gmgn.ai/defi/quotation/v1/smartmoney/sol/walletNew/{wallet}?period=7d"
-    response = requests.get(walletEndpoint)
+    response = session.get(walletEndpoint)
 
     if response.status_code == 200:
         data = response.json()
@@ -48,10 +54,9 @@ def getWalletData(wallet: str):
                     realizedProfit7dUSD = f"${data['realized_profit_7d']:,.2f}"
                     realizedProfit30dUSD = f"${data['realized_profit_30d']:,.2f}"
                     winrate_7d = f"{data['winrate'] * 100:.2f}%" if data['winrate'] is not None else "?"
-                    winrate_30data = requests.get(f"https://gmgn.ai/defi/quotation/v1/smartmoney/sol/walletNew/{wallet}?period=30d").json()['data']
+                    winrate_30data = session.get(f"https://gmgn.ai/defi/quotation/v1/smartmoney/sol/walletNew/{wallet}?period=30d").json()['data']
                     winrate_30d = f"{winrate_30data['winrate'] * 100:.2f}%" if winrate_30data['winrate'] is not None else "?"
                     
-
                     try:
                         tags = data['tags'] 
                     except Exception:
@@ -103,7 +108,6 @@ result_dict = {}
 for result in results:
     maker = result.pop('wallet')
     result_dict[maker] = result
-
 
 totalRequests = len(wallets)
 requestsSec = totalRequests / totalTime
